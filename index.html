@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VibeClicker</title>
+  <meta name="description" content="VibeClicker — a minimalist antigravity clicker game. Click to boost your vibe." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-from: #0d0015;
+      --bg-to: #1a0035;
+      --glass-bg: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(255, 255, 255, 0.10);
+      --glass-shadow: rgba(120, 40, 240, 0.25);
+      --accent: #a855f7;
+      --accent-glow: rgba(168, 85, 247, 0.55);
+      --text-primary: #f0e8ff;
+      --text-muted: rgba(220, 200, 255, 0.5);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: radial-gradient(ellipse at 30% 20%, #2e0060 0%, var(--bg-from) 60%),
+                  linear-gradient(160deg, #1a0035 0%, #0a000f 100%);
+      color: var(--text-primary);
+      overflow: hidden;
+    }
+
+    /* ── Floating orbs ── */
+    .orbs {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.18;
+      animation: float linear infinite;
+    }
+
+    .orb-1 {
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, #7c3aed, transparent 70%);
+      top: -10%; left: -8%;
+      animation-duration: 28s;
+      animation-delay: 0s;
+    }
+    .orb-2 {
+      width: 340px; height: 340px;
+      background: radial-gradient(circle, #a855f7, transparent 70%);
+      bottom: -5%; right: 5%;
+      animation-duration: 36s;
+      animation-delay: -12s;
+    }
+    .orb-3 {
+      width: 260px; height: 260px;
+      background: radial-gradient(circle, #c084fc, transparent 70%);
+      top: 40%; left: 55%;
+      animation-duration: 24s;
+      animation-delay: -8s;
+    }
+    .orb-4 {
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, #6d28d9, transparent 70%);
+      top: 65%; left: 15%;
+      animation-duration: 32s;
+      animation-delay: -20s;
+    }
+
+    @keyframes float {
+      0%   { transform: translateY(0px) translateX(0px) scale(1); }
+      25%  { transform: translateY(-30px) translateX(18px) scale(1.04); }
+      50%  { transform: translateY(-14px) translateX(36px) scale(0.97); }
+      75%  { transform: translateY(-42px) translateX(12px) scale(1.02); }
+      100% { transform: translateY(0px) translateX(0px) scale(1); }
+    }
+
+    /* ── Layout ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      gap: 2.5rem;
+      padding: 2rem;
+    }
+
+    /* ── Header ── */
+    header h1 {
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #e9d5ff 10%, #a855f7 60%, #7c3aed 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      user-select: none;
+      text-shadow: none;
+      filter: drop-shadow(0 0 18px rgba(168, 85, 247, 0.45));
+    }
+
+    /* ── Glass card ── */
+    .card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      padding: clamp(2.5rem, 6vw, 4rem) clamp(2.5rem, 8vw, 5rem);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2.5rem;
+      box-shadow:
+        0 8px 48px var(--glass-shadow),
+        inset 0 1px 0 rgba(255,255,255,0.07);
+      min-width: 300px;
+    }
+
+    /* ── Score ── */
+    .score-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .score-label {
+      font-size: 0.85rem;
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .score-value {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      font-size: clamp(3.5rem, 10vw, 5.5rem);
+      font-weight: 700;
+      line-height: 1;
+      color: #f0e8ff;
+      font-variant-numeric: tabular-nums;
+      filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.35));
+      transition: filter 0.1s ease;
+    }
+
+    .score-value.pulse {
+      filter: drop-shadow(0 0 32px rgba(168, 85, 247, 0.75));
+    }
+
+    /* ── Button ── */
+    #vibe-button {
+      position: relative;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #e9d5ff;
+      background: rgba(124, 58, 237, 0.18);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      border-radius: 50px;
+      padding: 0.85rem 2.8rem;
+      cursor: pointer;
+      outline: none;
+      overflow: hidden;
+      transition:
+        box-shadow 0.3s ease,
+        background 0.3s ease,
+        border-color 0.3s ease;
+      box-shadow:
+        0 0 0 0 var(--accent-glow),
+        0 4px 24px rgba(120, 40, 240, 0.2);
+    }
+
+    /* Shimmer pseudo-element */
+    #vibe-button::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        110deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.08) 50%,
+        transparent 70%
+      );
+      transform: translateX(-100%);
+      transition: transform 0s;
+    }
+
+    #vibe-button:hover {
+      background: rgba(124, 58, 237, 0.32);
+      border-color: rgba(168, 85, 247, 0.75);
+      box-shadow:
+        0 0 22px 4px var(--accent-glow),
+        0 8px 32px rgba(120, 40, 240, 0.35);
+    }
+
+    #vibe-button:hover::before {
+      transform: translateX(200%);
+      transition: transform 0.55s ease;
+    }
+
+    #vibe-button:active,
+    #vibe-button.clicked {
+      transform: scale(0.94);
+      transition: transform 0.08s ease;
+      box-shadow:
+        0 0 36px 8px var(--accent-glow),
+        0 4px 16px rgba(120, 40, 240, 0.5);
+    }
+
+    /* ── Floating +1 particles ── */
+    .particle {
+      position: fixed;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #c084fc;
+      pointer-events: none;
+      user-select: none;
+      z-index: 50;
+      opacity: 1;
+      text-shadow: 0 0 10px rgba(168, 85, 247, 0.8);
+      animation: rise 0.9s ease-out forwards;
+    }
+
+    @keyframes rise {
+      0%   { transform: translateY(0) scale(1);    opacity: 1; }
+      60%  { transform: translateY(-55px) scale(1.15); opacity: 0.8; }
+      100% { transform: translateY(-110px) scale(0.8);  opacity: 0; }
+    }
+
+    /* ── Subtle footer ── */
+    .hint {
+      position: fixed;
+      bottom: 1.5rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating orbs -->
+  <div class="orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+  </div>
+
+  <div class="page">
+    <!-- Header -->
+    <header>
+      <h1>VibeClicker</h1>
+    </header>
+
+    <!-- Central glass card -->
+    <main class="card" role="main">
+      <!-- Score display -->
+      <div class="score-block" aria-live="polite" aria-atomic="true">
+        <span class="score-label">Score</span>
+        <div class="score-value">
+          <span id="score">0</span>
+        </div>
+      </div>
+
+      <!-- Boost button -->
+      <button id="vibe-button" aria-label="Boost Vibe — click to increase your score">
+        Boost Vibe
+      </button>
+    </main>
+  </div>
+
+  <p class="hint">click to ascend</p>
+
+  <script>
+    let score = 0;
+    const scoreDisplay = document.getElementById('score');
+    const vibeButton   = document.getElementById('vibe-button');
+    const scoreVal     = scoreDisplay.closest('.score-value');
+
+    vibeButton.addEventListener('click', (e) => {
+      score++;
+      // One update to the UI based on the single 'score' variable
+      scoreDisplay.innerText = score;
+
+      // Button click animation
+      vibeButton.classList.add('clicked');
+      setTimeout(() => vibeButton.classList.remove('clicked'), 120);
+
+      // Score glow pulse
+      scoreVal.classList.add('pulse');
+      setTimeout(() => scoreVal.classList.remove('pulse'), 200);
+
+      // Floating +1 particle
+      spawnParticle(e.clientX, e.clientY);
+    });
+
+    function spawnParticle(x, y) {
+      const p = document.createElement('span');
+      p.className = 'particle';
+      p.textContent = '+1';
+
+      const drift = (Math.random() - 0.5) * 40;
+      p.style.left = (x + drift - 12) + 'px';
+      p.style.top  = (y - 10) + 'px';
+
+      document.body.appendChild(p);
+      p.addEventListener('animationend', () => p.remove());
+    }
+  </script>
+</body>
+</html>
