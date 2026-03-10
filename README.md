@@ -9,13 +9,13 @@
   <a href="https://github.com/KevinGeorge100/VibeClicker">
     <img src="https://img.shields.io/badge/GitHub-KevinGeorge100-181717?style=for-the-badge&logo=github" />
   </a>
-  <a href="mailto:your@email.com">
+  <a href="mailto:kevgeorgutty@gmail.com">
     <img src="https://img.shields.io/badge/Email-Contact%20Me-EA4335?style=for-the-badge&logo=gmail&logoColor=white" />
   </a>
-  <a href="https://wa.me/91XXXXXXXXXX">
+  <a href="https://wa.me/918281651978">
     <img src="https://img.shields.io/badge/WhatsApp-Chat-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" />
   </a>
-  <a href="https://linkedin.com/in/YOUR_LINKEDIN">
+  <a href="https://www.linkedin.com/in/kwingeorge">
     <img src="https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" />
   </a>
 </p>
